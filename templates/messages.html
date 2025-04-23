@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - SkillSwap</title>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}">SkillSwap</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('manage_requests') }}">Requests</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="messages-container">
+            <h2>Messages with {{ other_user.username }}</h2>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div id="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="conversation-info">
+                <h3>Skill: {{ request.skill.name }}</h3>
+                <p class="skill-description">{{ request.skill.description }}</p>
+            </div>
+            
+            <div id="message-list">
+                {% if messages %}
+                    <ul class="messages">
+                        {% for msg in messages %}
+                            <li class="message {% if msg.sender_id == session['user_id'] %}sent{% else %}received{% endif %}">
+                                <div class="message-content">
+                                    <p>{{ msg.content }}</p>
+                                    <span class="message-time">{{ msg.created_at.strftime('%H:%M - %b %d, %Y') }}</span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-messages">Start your conversation with {{ other_user.username }}!</p>
+                {% endif %}
+            </div>
+            
+            <div id="message-form-container">
+                <form id="message-form" action="{{ url_for('messages', request_id=request.id) }}" method="post">
+                    <div class="form-group">
+                        <textarea id="content" name="content" rows="3" placeholder="Type your message here..." required></textarea>
+                    </div>
+                    <button type="submit" id="send-button">Send Message</button>
+                </form>
+            </div>
+            
+            <a href="{{ url_for('manage_requests') }}" id="back-link">Back to Requests</a>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SkillSwap - All rights reserved</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/messages.js') }}"></script>
+</body>
+</html>

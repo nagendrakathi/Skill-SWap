@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile - SkillSwap</title>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}">SkillSwap</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li class="active"><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('manage_requests') }}">Requests</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="profile-container">
+            <h2>Your Profile</h2>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div id="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <section id="profile-info">
+                <h3>Personal Information</h3>
+                <div id="user-details">
+                    <p><strong>Username:</strong> {{ user.username }}</p>
+                    <p><strong>Email:</strong> {{ user.email }}</p>
+                    <p><strong>Member Since:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+                </div>
+                
+                <h3>Bio</h3>
+                <form id="bio-form" action="{{ url_for('profile') }}" method="post">
+                    <div class="form-group">
+                        <textarea id="bio" name="bio" rows="5" placeholder="Tell others about yourself...">{{ user.bio }}</textarea>
+                    </div>
+                    <button type="submit" id="update-bio-button">Update Bio</button>
+                </form>
+            </section>
+            
+            <div id="skills-container">
+                <section id="skills-offered">
+                    <h3>Skills You Can Teach</h3>
+                    {% if skills_offered %}
+                        <ul id="offered-skills-list">
+                            {% for skill in skills_offered %}
+                                <li class="skill-item" data-id="{{ skill.id }}">
+                                    <h4>{{ skill.name }}</h4>
+                                    <p class="skill-category">{{ skill.category }}</p>
+                                    <p class="skill-description">{{ skill.description }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>You haven't added any skills you can teach yet.</p>
+                    {% endif %}
+                    <a href="{{ url_for('add_skill') }}" class="add-skill-link">Add a skill you can teach</a>
+                </section>
+                
+                <section id="skills-wanted">
+                    <h3>Skills You Want to Learn</h3>
+                    {% if skills_wanted %}
+                        <ul id="wanted-skills-list">
+                            {% for skill in skills_wanted %}
+                                <li class="skill-item" data-id="{{ skill.id }}">
+                                    <h4>{{ skill.name }}</h4>
+                                    <p class="skill-category">{{ skill.category }}</p>
+                                    <p class="skill-description">{{ skill.description }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>You haven't added any skills you want to learn yet.</p>
+                    {% endif %}
+                    <a href="{{ url_for('add_skill') }}" class="add-skill-link">Add a skill you want to learn</a>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SkillSwap - All rights reserved</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+</body>
+</html>

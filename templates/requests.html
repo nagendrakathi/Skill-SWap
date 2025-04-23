@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Requests - SkillSwap</title>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}">SkillSwap</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li class="active"><a href="{{ url_for('manage_requests') }}">Requests</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="requests-container">
+            <h2>Manage Skill Requests</h2>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div id="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div id="requests-tabs">
+                <button class="tab-button active" data-tab="incoming">Incoming Requests</button>
+                <button class="tab-button" data-tab="outgoing">Outgoing Requests</button>
+            </div>
+            
+            <div id="incoming-requests" class="tab-content active">
+                <h3>Requests From Others</h3>
+                {% if incoming_requests %}
+                    <ul class="requests-list">
+                        {% for req in incoming_requests %}
+                            <li class="request-item" data-id="{{ req.id }}">
+                                <div class="request-info">
+                                    <h4>{{ req.skill.name }}</h4>
+                                    <p><strong>Requested by:</strong> {{ req.requester.username }}</p>
+                                    <p><strong>Status:</strong> <span class="request-status {{ req.status }}">{{ req.status }}</span></p>
+                                    <p><strong>Requested on:</strong> {{ req.created_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                                
+                                {% if req.status == 'pending' %}
+                                    <div class="request-actions">
+                                        <form action="{{ url_for('update_request', request_id=req.id) }}" method="post">
+                                            <input type="hidden" name="action" value="accept">
+                                            <button type="submit" class="accept-button">Accept</button>
+                                        </form>
+                                        <form action="{{ url_for('update_request', request_id=req.id) }}" method="post">
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="reject-button">Reject</button>
+                                        </form>
+                                    </div>
+                                {% elif req.status == 'accepted' %}
+                                    <div class="request-actions">
+                                        <a href="{{ url_for('messages', request_id=req.id) }}" class="message-button">Message</a>
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-requests-message">You have no incoming requests at the moment.</p>
+                {% endif %}
+            </div>
+            
+            <div id="outgoing-requests" class="tab-content">
+                <h3>Your Requests to Others</h3>
+                {% if outgoing_requests %}
+                    <ul class="requests-list">
+                        {% for req in outgoing_requests %}
+                            <li class="request-item" data-id="{{ req.id }}">
+                                <div class="request-info">
+                                    <h4>{{ req.skill.name }}</h4>
+                                    <p><strong>Teacher:</strong> {{ req.recipient.username }}</p>
+                                    <p><strong>Status:</strong> <span class="request-status {{ req.status }}">{{ req.status }}</span></p>
+                                    <p><strong>Requested on:</strong> {{ req.created_at.strftime('%B %d, %Y') }}</p>
+                                </div>
+                                
+                                {% if req.status == 'accepted' %}
+                                    <div class="request-actions">
+                                        <a href="{{ url_for('messages', request_id=req.id) }}" class="message-button">Message</a>
+                                    </div>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="no-requests-message">You haven't made any requests yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SkillSwap - All rights reserved</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/requests.js') }}"></script>
+</body>
+</html>

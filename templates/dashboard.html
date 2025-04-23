@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SkillSwap</title>
+</head>
+<body>
+    <header>
+        <h1><a href="{{ url_for('index') }}">SkillSwap</a></h1>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="active"><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                <li><a href="{{ url_for('manage_requests') }}">Requests</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="dashboard-container">
+            <h2>SkillSwap Dashboard</h2>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div id="flash-messages">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <section id="dashboard-actions">
+                <a href="{{ url_for('add_skill') }}" id="add-skill-button">Add New Skill</a>
+                <a href="{{ url_for('manage_requests') }}" id="view-requests-button">View Requests</a>
+            </section>
+            
+            <div id="skills-browser">
+                <h3>Browse Available Skills</h3>
+                
+                <div id="filters">
+                    <div class="filter-group">
+                        <label for="category-filter">Filter by Category:</label>
+                        <select id="category-filter">
+                            <option value="all">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="search-filter">Search:</label>
+                        <input type="text" id="search-filter" placeholder="Search by skill name or description">
+                    </div>
+                </div>
+                
+                <div id="skills-list">
+                    {% if skills %}
+                        <ul id="available-skills">
+                            {% for skill in skills %}
+                                <li class="skill-card" data-id="{{ skill.id }}" data-category="{{ skill.category }}">
+                                    <h4>{{ skill.name }}</h4>
+                                    <p class="skill-teacher">Taught by: {{ skill.teacher.username }}</p>
+                                    <p class="skill-category">{{ skill.category }}</p>
+                                    <p class="skill-description">{{ skill.description }}</p>
+                                    <form action="{{ url_for('request_skill', skill_id=skill.id) }}" method="post">
+                                        <button type="submit" class="request-button">Request to Learn</button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                    <p id="no-skills-message">No skills available at the moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 SkillSwap - All rights reserved</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
